@@ -69,16 +69,13 @@ export async function POST(request: NextRequest) {
       const smtpPort = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587
       const smtpSecure = process.env.SMTP_SECURE ? process.env.SMTP_SECURE === 'true' : false
       const smtpUser = (process.env.SMTP_USER || process.env.EMAIL_USER || 'autofactschecks@gmail.com').trim()
-      let smtpPass = (process.env.SMTP_PASS || '').trim().replace(/\s+/g, '')
-      const emailPass = (process.env.EMAIL_PASS || '').trim().replace(/\s+/g, '')
+      const smtpPass = [process.env.SMTP_PASS, process.env.SMTP_PASSWORD, process.env.EMAIL_PASS]
+        .map((password) => (password || '').trim().replace(/\s+/g, ''))
+        .find((password) => password && !password.toUpperCase().includes('YOUR_')) || ''
       const notifyTo = process.env.EMAIL_TO || 'autofactschecks@gmail.com'
 
-      if (!smtpPass || smtpPass.toUpperCase().includes('YOUR_APP_PASSWORD')) {
-        smtpPass = emailPass
-      }
-
       if (!smtpPass) {
-        console.warn('⚠️ No SMTP_PASS or EMAIL_PASS found — skipping email send')
+        console.warn('⚠️ No valid SMTP_PASS, SMTP_PASSWORD, or EMAIL_PASS found — skipping email send')
       } else {
         const transporterOptions = smtpHost.includes('gmail.com')
           ? {
@@ -110,7 +107,7 @@ export async function POST(request: NextRequest) {
         `
 
         await transporter.sendMail({
-          from: process.env.EMAIL_FROM || smtpUser,
+          from: process.env.EMAIL_FROM || process.env.SMTP_FROM || smtpUser,
           to: notifyTo,
           subject: `New order: ${order.order_number} (${package_type})`,
           html: mailHtml,

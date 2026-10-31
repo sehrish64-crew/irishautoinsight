@@ -90,10 +90,12 @@ export async function sendEmail(to: string, subject: string, htmlContent: string
     const SMTP_HOST = process.env.SMTP_HOST
     const SMTP_PORT = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined
     const SMTP_USER = process.env.SMTP_USER
-    const SMTP_PASS = process.env.SMTP_PASS
+    const SMTP_PASS = [process.env.SMTP_PASS, process.env.SMTP_PASSWORD]
+      .map((password) => (password || '').trim().replace(/\s+/g, ''))
+      .find((password) => password && !password.toUpperCase().includes('YOUR_'))
     const SMTP_SECURE = (process.env.SMTP_SECURE || 'false').toLowerCase() === 'true'
 
-    const fromAddress = process.env.EMAIL_FROM || (SMTP_USER ? SMTP_USER : 'Vehicle Reports <no-reply@localhost>')
+    const fromAddress = process.env.EMAIL_FROM || process.env.SMTP_FROM || (SMTP_USER ? SMTP_USER : 'Vehicle Reports <no-reply@localhost>')
 
     if (SMTP_HOST) {
       try {

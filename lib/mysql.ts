@@ -3,9 +3,9 @@ import mysql from 'mysql2/promise'
 const {
   DB_HOST = '127.0.0.1',
   DB_PORT = '3306',
-  DB_USER = 'u319625572_trueautocheck',
-  DB_PASSWORD = 'Trueautocheck321@',
-  DB_NAME = 'u319625572_trueautocheck',
+  DB_USER,
+  DB_PASSWORD,
+  DB_NAME,
 } = process.env
 
 console.log('\n📦 Database Configuration:')
@@ -30,7 +30,10 @@ const pool = mysql.createPool({
 // (CI/build or platforms without DB during build), attempting a connection
 // at module import time can cause noisy errors or unexpected failures.
 // Control this behavior via the ENABLE_DB_CHECK env var (set to 'true' to enable).
-if (process.env.ENABLE_DB_CHECK === 'true') {
+if (
+  process.env.ENABLE_DB_CHECK === 'true' &&
+  process.env.NEXT_PHASE !== 'phase-production-build'
+) {
   pool.getConnection()
     .then(conn => {
       console.log('✅ Database connection successful\n')
