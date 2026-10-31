@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/mysql'
 import { getTranslationsForLang } from '@/lib/translations'
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'autofactschecks@gmail.com'
+const ADMIN_EMAIL = process.env.EMAIL_TO || process.env.ADMIN_EMAIL || 'autofactschecks@gmail.com'
 const RESEND_API_KEY = process.env.RESEND_API_KEY || ''
 
 function generateOrderNotificationEmail(data: any, lang = 'en'): string {

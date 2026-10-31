@@ -63,6 +63,8 @@ export async function POST(request: NextRequest) {
       amount: order.amount
     })
 
+    let notificationEmailStatus: 'sent' | 'failed' | 'skipped' = 'skipped'
+
     // Send notification email to site owner with order details
     try {
       const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com'
@@ -72,7 +74,7 @@ export async function POST(request: NextRequest) {
       const smtpPass = [process.env.SMTP_PASS, process.env.SMTP_PASSWORD, process.env.EMAIL_PASS]
         .map((password) => (password || '').trim().replace(/\s+/g, ''))
         .find((password) => password && !password.toUpperCase().includes('YOUR_')) || ''
-      const notifyTo = process.env.EMAIL_TO || 'autofactschecks@gmail.com'
+      const notifyTo = process.env.EMAIL_TO || process.env.ADMIN_EMAIL || smtpUser
 
       if (!smtpPass) {
         console.warn('⚠️ No valid SMTP_PASS, SMTP_PASSWORD, or EMAIL_PASS found — skipping email send')
@@ -106,23 +108,32 @@ export async function POST(request: NextRequest) {
           </ul>
         `
 
-        await transporter.sendMail({
+        const info = await transporter.sendMail({
           from: process.env.EMAIL_FROM || process.env.SMTP_FROM || smtpUser,
           to: notifyTo,
           subject: `New order: ${order.order_number} (${package_type})`,
           html: mailHtml,
         })
 
-        console.log('✉️ Notification email sent to', notifyTo)
+        notificationEmailStatus = 'sent'
+        console.log('✉️ Order notification accepted by SMTP:', {
+          to: notifyTo,
+          messageId: info.messageId,
+        })
       }
     } catch (emailErr) {
-      console.error('❌ Failed to send notification email:', emailErr)
+      notificationEmailStatus = 'failed'
+      console.error('❌ Failed to send order notification email:', {
+        code: emailErr instanceof Error && 'code' in emailErr ? emailErr.code : undefined,
+        message: emailErr instanceof Error ? emailErr.message : String(emailErr),
+      })
     }
 
     return NextResponse.json({
       success: true,
       orderId: order.id,
       orderNumber: order.order_number,
+      notificationEmailStatus,
     })
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error)
