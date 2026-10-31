@@ -27,8 +27,10 @@ npm run dev
 
    For production testing:
 
-   - Ensure your production env has `EMAIL_USER`, `EMAIL_PASS`, and `EMAIL_TO` set.
+   - Add the SMTP variables to the live hosting environment (for example, Hostinger's Node.js app environment settings); `.env.local` on your computer is not deployed.
+   - Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (or `SMTP_PASSWORD`), and `EMAIL_TO`. For Gmail, use an App Password, not your normal account password.
    - Deploy and perform an order flow on the live site, then check the inbox specified in `EMAIL_TO`.
+   - The app returns `notificationEmailStatus: "skipped"` when the SMTP password is missing, and `"failed"` when the SMTP server rejects/fails the send. Check the live Node.js logs for these values and for `SMTP send failed`.
 
 5. Notes
 
@@ -42,4 +44,3 @@ npm run dev
       - Invalid app password or `EMAIL_PASS`/`SMTP_PASS` missing.
       - Gmail blocking sign-in from the server IP — prefer App Passwords, or move to a dedicated SMTP provider.
       - If Gmail keeps failing, set up SendGrid/Mailgun instead and use their SMTP credentials.
-

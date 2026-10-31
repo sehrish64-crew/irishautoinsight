@@ -26,7 +26,8 @@ export async function POST(request: NextRequest) {
 
     // Send admin notification and customer confirmation
     try {
-      const notificationResp = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/send-email`, {
+      const emailEndpoint = new URL('/api/send-email', request.url)
+      const notificationResp = await fetch(emailEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
         console.error('Failed to parse send-email response for order_notification:', notificationResp.status, text)
       }
 
-      const confirmationResp = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/send-email`, {
+      const confirmationResp = await fetch(emailEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

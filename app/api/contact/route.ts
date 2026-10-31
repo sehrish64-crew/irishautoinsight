@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     // Send notification to admin
     try {
-      const resp = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/send-email`, {
+      const resp = await fetch(new URL('/api/send-email', request.url), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'contact_form', name, email, subject, message }),

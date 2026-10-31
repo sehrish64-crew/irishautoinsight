@@ -67,9 +67,9 @@ export async function POST(request: Request) {
 
     // Notify admin about new review (non-blocking)
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-      console.log('📧 Sending review notification email using baseUrl:', baseUrl);
-      const resp = await fetch(`${baseUrl}/api/send-email`, {
+      const emailEndpoint = new URL('/api/send-email', request.url);
+      console.log('📧 Sending review notification email using request origin');
+      const resp = await fetch(emailEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

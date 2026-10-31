@@ -15,7 +15,7 @@ export async function POST(request: NextRequest, context: any) {
     const order = await getOrderById(id)
     if (!order) return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 })
 
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/send-email`, {
+    const resp = await fetch(new URL('/api/send-email', request.url), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
