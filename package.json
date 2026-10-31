@@ -9,7 +9,7 @@
   "scripts": {
     "preinstall": "npm set ignore-scripts false",
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "start:hostinger": "node hostinger-start.js",
     "lint": "next lint",
