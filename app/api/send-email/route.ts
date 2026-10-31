@@ -36,7 +36,20 @@ function generateOrderConfirmationEmail(data: any, lang = 'en'): string {
 
 function generateContactFormEmail(data: any, lang = 'en'): string {
   const t = getTranslationsForLang(lang)
-  return `<!DOCTYPE html><html><body><h1>${t['email_contact_submission'] || 'Contact Form Submission'}</h1><p>${t['email_name'] || 'Name'}: ${data.name}</p><p>${t['email_email'] || 'Email'}: ${data.email}</p><p>${t['email_subject'] || 'Subject'}: ${data.subject}</p><pre>${data.message}</pre></body></html>`
+  return `<!DOCTYPE html><html><body><h1>${t['email_contact_submission'] || 'Contact Form Submission'}</h1><p>${t['email_name'] || 'Name'}: ${escapeHtml(String(data.name || ''))}</p><p>${t['email_email'] || 'Email'}: ${escapeHtml(String(data.email || ''))}</p><p>${t['email_subject'] || 'Subject'}: ${escapeHtml(String(data.subject || ''))}</p><pre>${escapeHtml(String(data.message || ''))}</pre></body></html>`
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => {
+    const entities: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    }
+    return entities[character]
+  })
 }
 
 function generateReviewNotificationEmail(data: any, lang = 'en'): string {

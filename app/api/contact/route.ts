@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/mysql'
+import { POST as sendEmailRoute } from '@/app/api/send-email/route'
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,31 +42,19 @@ export async function POST(request: NextRequest) {
       console.error('Failed to store contact form submission:', persistenceError)
     }
 
-    // Send notification to admin
+    // Send directly in-process rather than making an HTTP request back to this deployment.
     try {
-      const resp = await fetch(new URL('/api/send-email', request.url), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'contact_form', name, email, subject, message }),
-      })
+      const emailResponse = await sendEmailRoute(
+        new NextRequest(new URL('/api/send-email', request.url), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'contact_form', name, email, subject, message }),
+        })
+      )
+      const emailResult = await emailResponse.json()
 
-      try {
-        const json = await resp.json()
-        if (!resp.ok || json?.success === false) {
-          console.error('Contact form email failed:', resp.status, json)
-          return NextResponse.json(
-            {
-              success: false,
-              error: persisted
-                ? 'Your message was saved, but the notification email could not be sent. Please try again later or email us directly.'
-                : 'The notification email could not be sent. Please try again later or email us directly.',
-              persisted,
-            },
-            { status: 502 }
-          )
-        }
-      } catch (e) {
-        console.error('Failed to parse send-email response for contact_form:', resp.status, e)
+      if (!emailResponse.ok || emailResult?.success === false) {
+        console.error('Contact form email failed:', emailResult.message)
         return NextResponse.json(
           {
             success: false,
