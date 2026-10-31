@@ -47,6 +47,7 @@ export default function GetReportForm({ isOpen, onClose, preselectedPackage, pre
   const [vehicleType, setVehicleType] = useState('')
   const [vinNumber, setVinNumber] = useState('')
   const [plateNumber, setPlateNumber] = useState('')
+  const [customerName, setCustomerName] = useState('')
   const [customerEmail, setCustomerEmail] = useState('')
   const [selectedPackage, setSelectedPackage] = useState(preselectedPackage || '')
   const [selectedCountryCode, setSelectedCountryCode] = useState(selectedCountry?.code || 'IE')
@@ -65,6 +66,7 @@ export default function GetReportForm({ isOpen, onClose, preselectedPackage, pre
     if (!vehicleType) return setError(t('form_error_vehicle_type')), false
     if (vehicleIdType === 'vin' && !vinNumber) return setError(t('form_error_vin')), false
     if (vehicleIdType === 'plate' && !plateNumber) return setError(t('form_error_plate')), false
+    if (!customerName.trim()) return setError(t('form_error_name')), false
     if (!customerEmail) return setError(t('form_error_email')), false
     if (!selectedPackage) return setError(t('form_error_package')), false
     return true
@@ -80,6 +82,7 @@ export default function GetReportForm({ isOpen, onClose, preselectedPackage, pre
 
     try {
       const requestBody = {
+        customer_name: customerName.trim(),
         customer_email: customerEmail,
         vehicle_type: vehicleType,
         vin_number: vehicleIdType === 'vin' ? vinNumber : null,
@@ -236,6 +239,22 @@ export default function GetReportForm({ isOpen, onClose, preselectedPackage, pre
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="customerName" className="block text-sm font-semibold text-gray-900 mb-2">
+                {t('form_client_name')}
+              </Label>
+              <Input
+                id="customerName"
+                type="text"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder={t('form_client_name_placeholder')}
+                required
+                maxLength={255}
+                className="h-12"
+              />
             </div>
 
             <div>

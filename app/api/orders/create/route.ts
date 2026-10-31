@@ -6,6 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const {
+      customer_name,
       customer_email,
       vehicle_type,
       identification_type,
@@ -17,6 +18,7 @@ export async function POST(request: NextRequest) {
       amount,
       paymentProvider,
     } = body
+    const customerName = typeof customer_name === 'string' ? customer_name.trim() : ''
 
     console.log('\n📝 Creating order with data:', { 
       customer_email, 
@@ -99,6 +101,7 @@ export async function POST(request: NextRequest) {
           <ul>
             <li><strong>Order ID:</strong> ${order.id}</li>
             <li><strong>Order Number:</strong> ${order.order_number}</li>
+            <li><strong>Client Name:</strong> ${customerName ? escapeHtml(customerName) : 'Not provided'}</li>
             <li><strong>Customer Email:</strong> ${customer_email}</li>
             <li><strong>Vehicle Type:</strong> ${vehicle_type}</li>
             <li><strong>Identification Type:</strong> ${identification_type}</li>
@@ -144,4 +147,17 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => {
+    const entities: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    }
+    return entities[character]
+  })
 }

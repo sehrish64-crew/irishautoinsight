@@ -89,8 +89,8 @@ export async function sendEmail(to: string, subject: string, htmlContent: string
     // Prefer SMTP (Nodemailer) if configured
     const SMTP_HOST = process.env.SMTP_HOST
     const SMTP_PORT = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined
-    const SMTP_USER = process.env.SMTP_USER
-    const SMTP_PASS = [process.env.SMTP_PASS, process.env.SMTP_PASSWORD]
+    const SMTP_USER = process.env.SMTP_USER || process.env.EMAIL_USER
+    const SMTP_PASS = [process.env.SMTP_PASS, process.env.SMTP_PASSWORD, process.env.EMAIL_PASS]
       .map((password) => (password || '').trim().replace(/\s+/g, ''))
       .find((password) => password && !password.toUpperCase().includes('YOUR_'))
     const SMTP_SECURE = (process.env.SMTP_SECURE || 'false').toLowerCase() === 'true'
@@ -314,9 +314,9 @@ export async function POST(request: NextRequest) {
 
     if (data.type === 'contact_form') {
       const html = generateContactFormEmail(data, lang)
-      const subject = (getTranslationsForLang(lang)['email_contact_subject'] || `Contact Form: ${data.subject}`)
+      const subject = `Contact Form: ${data.subject}`
       const result = await sendEmail(ADMIN_EMAIL, subject, html)
-      return NextResponse.json(result)
+      return NextResponse.json(result, { status: result.success ? 200 : 502 })
     }
 
     if (data.type === 'review_notification') {

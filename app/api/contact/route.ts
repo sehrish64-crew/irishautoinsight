@@ -53,13 +53,42 @@ export async function POST(request: NextRequest) {
         const json = await resp.json()
         if (!resp.ok || json?.success === false) {
           console.error('Contact form email failed:', resp.status, json)
+          return NextResponse.json(
+            {
+              success: false,
+              error: persisted
+                ? 'Your message was saved, but the notification email could not be sent. Please try again later or email us directly.'
+                : 'The notification email could not be sent. Please try again later or email us directly.',
+              persisted,
+            },
+            { status: 502 }
+          )
         }
       } catch (e) {
-        const text = await resp.text().catch(() => null)
-        console.error('Failed to parse send-email response for contact_form:', resp.status, text)
+        console.error('Failed to parse send-email response for contact_form:', resp.status, e)
+        return NextResponse.json(
+          {
+            success: false,
+            error: persisted
+              ? 'Your message was saved, but email delivery could not be confirmed. Please try again later or email us directly.'
+              : 'Email delivery could not be confirmed. Please try again later or email us directly.',
+            persisted,
+          },
+          { status: 502 }
+        )
       }
     } catch (err) {
       console.error('Failed to send contact notification:', err)
+      return NextResponse.json(
+        {
+          success: false,
+          error: persisted
+            ? 'Your message was saved, but the notification email could not be sent. Please try again later or email us directly.'
+            : 'The notification email could not be sent. Please try again later or email us directly.',
+          persisted,
+        },
+        { status: 502 }
+      )
     }
 
     return NextResponse.json({

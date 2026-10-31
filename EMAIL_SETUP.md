@@ -4,7 +4,7 @@ Email setup and local testing
 1. Create a local env file
 
    - Copy `.env.local.example` to `.env.local` in the project root.
-   - Fill `EMAIL_PASS` and `SMTP_PASS` with the same Gmail App Password.
+   - Fill `EMAIL_PASS` and `SMTP_PASS` with the same Gmail App Password. The email route accepts `EMAIL_USER`/`EMAIL_PASS` as aliases for `SMTP_USER`/`SMTP_PASS`.
    - For production/live deployments, use the hosting provider's env settings or copy `.env.production.example` to `.env.production` (do NOT commit secrets).
 
 2. Generate a Gmail app password (recommended)
@@ -31,6 +31,7 @@ npm run dev
    - Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (or `SMTP_PASSWORD`), and `EMAIL_TO`. For Gmail, use an App Password, not your normal account password.
    - Deploy and perform an order flow on the live site, then check the inbox specified in `EMAIL_TO`.
    - The app returns `notificationEmailStatus: "skipped"` when the SMTP password is missing, and `"failed"` when the SMTP server rejects/fails the send. Check the live Node.js logs for these values and for `SMTP send failed`.
+   - Test the contact form too. If delivery fails, the form now reports the email failure instead of displaying a false success; the submission is still stored when the database is available.
 
 5. Notes
 
@@ -42,5 +43,6 @@ npm run dev
 
    - If emails are not sending, check server logs for email errors. Common issues:
       - Invalid app password or `EMAIL_PASS`/`SMTP_PASS` missing.
+      - If Gmail logs `535 5.7.8 Username and Password not accepted`, replace the live hosting SMTP credentials with the correct Gmail account and a freshly generated Gmail App Password, then restart/redeploy the app.
       - Gmail blocking sign-in from the server IP — prefer App Passwords, or move to a dedicated SMTP provider.
       - If Gmail keeps failing, set up SendGrid/Mailgun instead and use their SMTP credentials.
