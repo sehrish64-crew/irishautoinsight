@@ -80,6 +80,8 @@
   "form_plate_help_text": "Enter your vehicle's license plate number",
   "form_vehicle_type": "Vehicle Type",
   "form_vehicle_type_placeholder": "Select vehicle type",
+  "form_package": "Package",
+  "form_package_placeholder": "Select package",
   "form_client_name": "Client Name",
   "form_client_name_placeholder": "Enter your name",
   "form_email_address": "Email Address",

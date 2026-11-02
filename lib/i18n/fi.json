@@ -80,6 +80,8 @@
   "form_plate_help_text": "Anna ajoneuvosi rekisterikilven numero",
   "form_vehicle_type": "Ajoneuvotyyppi",
   "form_vehicle_type_placeholder": "Valitse ajoneuvotyyppi",
+  "form_package": "Paketti",
+  "form_package_placeholder": "Valitse paketti",
   "form_client_name": "Asiakkaan nimi",
   "form_client_name_placeholder": "Kirjoita nimesi",
   "form_email_address": "Sähköpostiosoite",

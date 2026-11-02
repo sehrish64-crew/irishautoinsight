@@ -38,7 +38,7 @@ const packages = [
     name: 'Premium Report',
     stripeUrl: 'https://buy.stripe.com/aFabJ121heEn0FL3bYbo407',
   },
-]
+] as const
 
 export default function GetReportForm({ isOpen, onClose, preselectedPackage, prefilledIdentType, prefilledIdentValue }: GetReportFormProps) {
   const { selectedCountry, setSelectedCountry } = useCountry()
@@ -242,6 +242,27 @@ export default function GetReportForm({ isOpen, onClose, preselectedPackage, pre
             </div>
 
             <div>
+              <Label htmlFor="package" className="block text-sm font-semibold text-gray-900 mb-2">
+                {t('form_package')}
+              </Label>
+              <Select value={selectedPackage} onValueChange={setSelectedPackage}>
+                <SelectTrigger id="package" className="h-12">
+                  <SelectValue placeholder={t('form_package_placeholder')} />
+                </SelectTrigger>
+                <SelectContent className="z-[10000]">
+                  {packages.map((reportPackage) => (
+                    <SelectItem key={reportPackage.id} value={reportPackage.id}>
+                      {reportPackage.name} - {formatCurrency(
+                        getPrice(reportPackage.id, selectedCountry.currency),
+                        selectedCountry.currency
+                      )}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
               <Label htmlFor="customerName" className="block text-sm font-semibold text-gray-900 mb-2">
                 {t('form_client_name')}
               </Label>
@@ -340,7 +361,7 @@ export default function GetReportForm({ isOpen, onClose, preselectedPackage, pre
                             getPrice(selectedPackage as any, selectedCountry.currency),
                             selectedCountry.currency
                           )
-                        : '$0'
+                        : '0'
                     }`}
               </Button>
             </div>
